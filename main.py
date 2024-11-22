@@ -65,6 +65,7 @@ satis_verisi.loc[satis_verisi["fiyat"].isnull(), "fiyat"] = satis_verisi.loc[sat
 satis_verisi.loc[satis_verisi["toplam_satis"].isnull(), "toplam_satis"] = satis_verisi.loc[satis_verisi["toplam_satis"]<100000,"toplam_satis"].mean()
 
 #Outlier'ı bulma ve çıkarma
+#Outlier sürecine kadar herhangi bir verimizi kaybetmedik. Bu süreçte Quantile formülü ile belli aralık dışı değerleri bulacağız.
 def find_boundaries(df, variable, distance):
     IQR = df[variable].quantile(0.75) - df[variable].quantile(0.25)
     lower_boundary = df[variable].quantile(0.25) - (IQR * distance)
@@ -73,13 +74,14 @@ def find_boundaries(df, variable, distance):
 
 variable="toplam_satis"
 upper_boundary, lower_boundary = find_boundaries(satis_verisi, variable, 1.5)
-
+#Outlier olan satırların indexlerini liste haline getirip fiyat*adet ile uyumlu olanları saptadım ve düzenledim.
 outliers_index = (satis_verisi[variable]>upper_boundary) | (satis_verisi[variable]<lower_boundary)
 listofoutliers = list(satis_verisi[outliers_index].index)
 satis_verisi.loc[listofoutliers,"toplam_satis"] = satis_verisi.loc[listofoutliers,"fiyat"]*satis_verisi.loc[listofoutliers,"adet"]
 
 satis_verisi.describe()
-
+#Bu süreçte fiyat*adet=toplam_satiş hesabında 2'den fazla bilinmeyen değer olan 5 verimiz kaldı.
+#Bu 5 veri yüksek bir oranda olmadığı için çıkarmak daha makul geldi.
 variable2='fiyat'
 upper_boundary, lower_boundary = find_boundaries(satis_verisi, variable2, 1.5)
 
@@ -94,17 +96,18 @@ merged_data = pd.merge(musteri_verisi, satis_verisi, on="musteri_id")
 merged_data.head()
 
 merged_data.info()
+merged_data.describe()
 
-# 'tarih' sütununu datetime formatına çevirme
+# 'tarih' sütununu datetime formatına çevirme işlemi ile görev 2'ye başladım.
 merged_data["tarih"] = pd.to_datetime(merged_data["tarih"])
 
-# 'tarih' sütununu indeks olarak ayarlama
+# 'tarih' sütununu indeks olarak ayarladım.
 merged_data.set_index("tarih", inplace=True)
 merged_data = merged_data.sort_index()
-
+#Haftalık ve aylık toplam satış değerlerimiz
 haftalik_toplam_satis = merged_data["toplam_satis"].resample("W").sum()
 aylik_toplam_satis = merged_data["toplam_satis"].resample("ME").sum()
-
+#Haftalık ve aylık toplam satışın ürüne göre değerleri
 haftalik_urun_satis = merged_data.groupby("ürün_adi")["toplam_satis"].resample("W").sum()
 aylik_urun_satis = merged_data.groupby("ürün_adi")["toplam_satis"].resample("ME").sum()
 
@@ -113,7 +116,7 @@ aylik_toplam_satis.plot(title="Aylık Toplam Satış")
 plt.show()
 
 #Resample'daki MS ve ME kullanımları tarihlerin ilk ve son gününü veriyor satışın değil. Satışın ilk ve son
-# gününü bulmak için kodu bu şekle getirdim.
+# gününü bulmak için veriyi aylık periodlara ayırıp içindeki en düşük tarihli değeri seçtim.
 ilk_satis_gunleri = merged_data.groupby(merged_data.index.to_period("M")).apply(lambda x: x.index.min())
 son_satis_gunleri = merged_data.groupby(merged_data.index.to_period("M")).apply(lambda x: x.index.max())
 
@@ -134,7 +137,7 @@ haftalik_urun_sayisi.plot(
     figsize=(8, 5),
     marker='o',
     color="orange",
-    title="Aylık Ürün Satış Miktarı",
+    title="Haftalık Ürün Satış Miktarı",
     ylabel="Toplam Ürün Adedi",
     xlabel="Tarih",
     grid=True
@@ -147,11 +150,13 @@ kategori_toplam_satis = merged_data.groupby("kategori")["toplam_satis"].sum()
 # her bir kategorinin tüm satışlara oranı
 kategori_oranlari = (kategori_toplam_satis / kategori_toplam_satis.sum()) * 100
 
+#Burada yaş değerlerini liste haline getirerek yaş_grubu sütunu oluşturdum.
+#Oluşturduğum sütunlardan yaş grubuna göre toplam satış değerlerini buldum.
 bins = [18, 25, 35, 50, 100]
 labels = ["18-25", "26-35", "36-50", "50+"]
 merged_data["yas_grubu"] = pd.cut(merged_data["yas"], bins=bins, labels=labels, right=False)
 yas_grubu_toplam_satis = merged_data.groupby("yas_grubu")["toplam_satis"].sum()
-
+#Cinsiyete göre en çok harcanan kategorilerin listesini yaptım
 harcama_analizi = merged_data.groupby("cinsiyet")["harcama_miktari"].agg(["sum", "mean"])
 kategori_harcamalari = merged_data.groupby(["cinsiyet", "kategori"])["toplam_satis"].sum()
 en_cok_harcama_kategori = kategori_harcamalari.groupby("cinsiyet").idxmax()
@@ -167,35 +172,27 @@ merged_data['tarih_ay'] = merged_data.index.to_period('M')
 # Her bir ürün için aylık toplam satışları hesapladım.
 aylik_urun_satislari = merged_data.groupby(['tarih_ay', 'ürün_kodu'])['toplam_satis'].sum().reset_index()
 
-# Değişim oranını hesaplamak için veriyi sıralayın
+# Aylık ürün satışlarını ürün kodu ve tarihine göre sıraladım. Sonra 1 adım shift ederek önceki ay satış kolonu oluşturdum.
+# Bir önceki aydan çıkarıp önceki ürün satışına bölerek yüzdesel değişimi buldum
 aylik_urun_satislari.sort_values(by=['ürün_kodu', 'tarih_ay'], inplace=True)
-# Bir önceki ayın toplam satışını hesaplayın
 aylik_urun_satislari['onceki_ay_satis'] = aylik_urun_satislari.groupby('ürün_kodu')['toplam_satis'].shift(1)
-# Değişim oranı hesaplamas kısmı
 aylik_urun_satislari['satis_degisim_orani'] = ((aylik_urun_satislari['toplam_satis'] - aylik_urun_satislari['onceki_ay_satis']) / aylik_urun_satislari['onceki_ay_satis']) * 100
 
-# Tarihi aylık bazda gruplamak için dönüştürme
-merged_data['tarih_ay'] = merged_data.index.to_period('M')
-# Her kategori için aylık toplam satışları hesapla
+# Her kategori için aylık toplam satışları hesapladım. Ardından yüzdelik değişim oranlarını yazdırdım.
 aylik_satislar = merged_data.groupby(['tarih_ay', 'kategori'])['toplam_satis'].sum()
-# Aylık değişim oranını hesapla (pct_change ile yüzdelik değişim)
 degisim_oranlari = aylik_satislar.groupby(level=1).pct_change() * 100
 
-# Ürün bazında toplam satışları hesapla
-urun_satislari = merged_data.groupby("ürün_adi")["toplam_satis"].sum()
+########Pareto Analizi###########
 
-# Satışlara göre azalan sırada sıralama
+# ürün bazlı toplam saıtşların hesabını yaparak azalan şekilde sıraladım.
+urun_satislari = merged_data.groupby("ürün_adi")["toplam_satis"].sum()
 urun_satislari = urun_satislari.sort_values(ascending=False)
 
-# Kümülatif satış oranını hesapla
+# Kümülatif satış oranınını bulup %80 altında kalan ürünleri belirledim.
 kümülatif_oran = urun_satislari.cumsum() / urun_satislari.sum()
-
-# %80'in altındaki ürünleri belirle
 pareto_urunleri = urun_satislari[kümülatif_oran <= 0.8]
 
-# Grafik çizimi
-import matplotlib.pyplot as plt
-
+# Grafik çizimi ile görselleştirdim.
 plt.figure(figsize=(10, 6))
 pareto_urunleri.plot(kind='bar', color='skyblue', alpha=0.7)
 plt.title("Pareto Analizi: Satışların %80'ini Oluşturan Ürünler")
