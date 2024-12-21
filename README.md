@@ -1,60 +1,99 @@
+# Data Analysis and Manipulation
 
-Data-Analysis-and-Manipulation
-Patika.dev & New Mind AI Bootcamp Task
+## 📋 About the Project
 
+This project is part of the **Patika.dev & New Mind AI Bootcamp** and focuses on **data cleaning, analysis, and visualization**. It involves working with **sales** and **customer data** to perform various data manipulation and analysis techniques to gain actionable insights.
 
-Veri Analizi ve Manipülasyonu
-Bu proje, veri temizleme, analiz ve görselleştirme süreçlerini içeren bir veri analizi çalışmasını kapsamaktadır. Proje, satış ve müşteri verileri üzerinde çeşitli veri manipülasyonu ve analiz yöntemlerini kullanarak sonuçlar elde etmeyi amaçlamaktadır.
+---
 
+## 🛠️ Project Goals
+- Enhance advanced data manipulation and analysis skills.
+- Derive meaningful insights from data.
+- Present results using effective visualization techniques.
 
-Bu proje kapsamında, satış ve müşteri verileri üzerinde:
+---
 
+## 🔍 Key Features
+This project covers:
+1. **Data Cleaning**
+   - Handling missing and outlier values.
+   - Merging sales and customer datasets via `musteri_id`.
+   
+2. **Time Series Analysis**
+   - Analyzing weekly and monthly sales and product trends.
+   - Identifying the first and last sales day of each month.
+   - Visualizing fluctuations in time series data.
 
-Veri temizleme,
-Zaman serisi analizi,
-Kategorik ve sayısal analiz,
-İleri düzey veri manipülasyonu ve
-Ayrıca, müşteri davranışlarını anlamak için Pareto analizleri yapılmıştır.
+3. **Categorical and Numerical Analysis**
+   - Calculating total sales and percentages by product category.
+   - Analyzing sales trends based on age groups (e.g., 18-25, 26-35, 36-50, 50+).
+   - Comparing spending habits of male and female customers.
 
+4. **Advanced Data Manipulation**
+   - Calculating total spending by city and ranking cities by top-spending customers.
+   - Computing growth rates for products and categories.
+   - Monthly total sales by category and visualizing their change rates.
 
-Proje Hedefleri
-Karmaşık veri manipülasyonu ve analiz becerilerini geliştirmek.
-Verilerden anlamlı sonuçlar çıkararak içgörü sağlamak.
-Görselleştirme teknikleriyle sonuçları sunmak.
-Kullanılan Kütüphaneler
-Projenin uygulanması için aşağıdaki Python kütüphaneleri kullanılmıştır:
+5. **Bonus: Pareto Analysis**
+   - Identifying products contributing to 80% of total sales.
 
+---
 
-Pandas (Veri manipülasyonu)
-Matplotlib/Seaborn (Görselleştirme)
-scikit-learn (Tahmin modelleri)
-Veri Setleri
-Proje kapsamında iki veri seti kullanılmıştır:
+## 📊 Datasets
+### Sales Data
+- **Columns:** `tarih`, `ürün_kodu`, `ürün_adı`, `kategori`, `fiyat`, `adet`, `toplam_satis`
 
-Satış Verisi
-Kolonlar: tarih, ürün_kodu, ürün_adı, kategori, fiyat, adet, toplam_satis
-Müşteri Verisi
-Kolonlar: musteri_id, isim, cinsiyet, yas, sehir, harcama_miktari
-Görevler
+### Customer Data
+- **Columns:** `musteri_id`, `isim`, `cinsiyet`, `yas`, `sehir`, `harcama_miktari`
 
-Görev 1: Veri Temizleme ve Manipülasyonu
-Eksik ve aykırı değerlerin analizi ve temizlenmesi.
-Satış ve müşteri verilerinin musteri_id üzerinden birleştirilmesi.
+---
 
-Görev 2: Zaman Serisi Analizi
-Haftalık ve aylık bazda satış ve ürün trendlerinin analizi.
-Tarih sütununu kullanarak, her ayın ilk ve son satış günlerinin bulunması,her hafta kaç ürün satıldığının hesaplanması.
-Zaman serisindeki dalgalanmaların grafiklerle görselleştirilmesi.
+## 🚀 Tools and Libraries Used
+- **`Pandas`**: For data manipulation.
+- **`Matplotlib/Seaborn`**: For visualization.
+- **`scikit-learn`**: For predictive modeling and analysis.
 
-Görev 3: Kategorik ve Sayısal Analiz
-Ürün kategorilerine göre toplam satış miktarı ve her kategorinin tüm satışlar içindeki oranının hesaplanması.
-Müşterilerin yaş gruplarına göre satış eğilimlerinin analiz edilmesi. (Örnek yaş grupları: 18-25, 26-35, 36-50, 50+)
-Kadın ve erkek müşterilerin harcama davranışlarının karşılaştırılması.
+---
 
-Görev 4: İleri Düzey Veri Manipülasyonu
-Müşterilerin şehir bazında toplam harcama miktarının bulunması ve şehirlerin en çok harcama yapan müşterilere göre sıralanması.
-Ürün ve kategori bazında satış artış oranlarının hesaplanması.
-Her bir kategorinin aylık toplam satışlarının hesaplanması ve değişim oranlarının görselleştirilmesi.
+## 📝 Tasks
+### **Task 1: Data Cleaning and Manipulation**
+- Analyzed and handled missing/outlier values.
+- Merged sales and customer datasets using `musteri_id`.
 
-Görev 5: Ekstra (Bonus)
-Pareto Analizi: Satışların %80’ini oluşturan ürünlerin belirlenmesi.
+### **Task 2: Time Series Analysis**
+- Analyzed weekly and monthly sales/product trends.
+- Identified first/last sales days of each month and calculated weekly product sales.
+- Visualized fluctuations in sales over time.
+
+### **Task 3: Categorical and Numerical Analysis**
+- Total sales and their percentages by product category.
+- Sales trends based on customer age groups.
+- Spending behavior comparisons between genders.
+
+### **Task 4: Advanced Data Manipulation**
+- Total spending by city and ranked cities by top-spending customers.
+- Calculated growth rates for products/categories.
+- Visualized monthly total sales and their change rates.
+
+### **Task 5: Pareto Analysis**
+- Identified the products contributing to 80% of total sales.
+
+---
+
+## 📈 Visualization and Results
+The project includes various visualizations (bar plots, line charts, pie charts) to represent:
+- Time-based sales trends.
+- Category-based sales distribution.
+- Spending habits by age and gender.
+- Pareto analysis insights.
+
+---
+
+## 🌟 Outcomes
+- Developed hands-on expertise in data cleaning and advanced manipulation techniques.
+- Gained insights into sales and customer behaviors.
+- Learned how to effectively visualize data for presentation and decision-making.
+
+---
+
+Feel free to explore and contribute to this repository!
